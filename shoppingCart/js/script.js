@@ -17,7 +17,25 @@ for (var i = 0; i < removeFromCartBtn.length; i++) {
     
 }
 
+// function for showing alerts
+function showAlerts(message, className) {
+    let alertDiv = document.createElement('div');
+    
 
+    alertDiv.className = `alert ${className} center`; // creating alert class
+    alertDiv.appendChild(document.createTextNode(message));
+    
+    //console.log(alertDiv);
+
+    let firstDiv = document.getElementById('first-div');
+    let firstRow= document.getElementById('first-row');
+    firstDiv.insertBefore(alertDiv, firstRow);
+
+    setTimeout(() => {
+        document.querySelector('.alert').remove();
+    }, 3000);
+
+}
 
 // function to add item to cart
 function addToCart(e) {
@@ -28,7 +46,7 @@ function addToCart(e) {
     
     addItemToCart(itemTitle, itemPrice);
     
-    
+    e.preventDefault();
 }
 // functon that create innerHTML table row and append to the cart table 
 function addItemToCart(title, price) {
@@ -40,7 +58,7 @@ function addItemToCart(title, price) {
 
     for(var i=0; i<cartItemName.length; i++) {
         if(cartItemName[i].innerText == title) { // checling an item is alredy in the cart
-            alert('This item is already in your list! Please select another...');
+            showAlerts('This item is already in your list! Please select another...', 'error');
             return;
         }
     }
@@ -55,8 +73,12 @@ function addItemToCart(title, price) {
         `
     cartItemRow.innerHTML = cartItemRowData;
     cartTbody.appendChild(cartItemRow);
+
+
+    showAlerts("The item is successfully added to the cart!", "success");
     
-    cartItemRow.getElementsByClassName('cart-remove-btn')[0].addEventListener('click', removeFromCart); // adding an eventlistener to remove the item that is added by the function
+    // adding an eventlistener to remove the item that is added by the function
+    cartItemRow.getElementsByClassName('cart-remove-btn')[0].addEventListener('click', removeFromCart); 
     //console.log(cartItemRow);
     
 
@@ -68,7 +90,10 @@ function addItemToCart(title, price) {
 function removeFromCart(e) {
     let removeBtn = e.target.parentElement.parentElement; //targetting the table row 
     removeBtn.remove();
-}
 
+    showAlerts("The item is successfully removed from the cart!", "success");
+
+    e.preventDefault();
+}
 
 
