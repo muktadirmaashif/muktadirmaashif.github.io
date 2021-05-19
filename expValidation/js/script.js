@@ -1,25 +1,3 @@
-let re;
-let str;
-
-//postal code
-re = /^[0-9]{4}$/;
-str = "2220";
-
-// phone number
-re = /^(\+88)?(88)?01[0-9]{9}$/;
-str = "01521443805";
-
-//email address
-//re = /^([a-zA-Z0-9](\.|\-|\_)?)+[^\.^\_^\-^\@]@[a-z\.]+[^\.^\_^\-^\!^\@^\#^\$^\&^\*]$/;
-//str = "mmm1604116@askdlfhgaskdlf.com.bd.un";
-
-// html tag
-re = /^<\/?[a-z]+>$/;
-str = "</div>";
-
-console.log(re.test(str));
-
-//alert(selectOption.options[selectOption.selectedIndex].text);
 
 function regexFunction() {
     let selectOption  = document.getElementById("select-regex");
@@ -68,3 +46,26 @@ function regexFunction() {
   }
 
   
+
+//let re;
+//let str;
+
+//postal code
+//re = /^[0-9]{4}$/;
+//str = "2220";
+
+// phone number
+//re = /^(\+88)?(88)?01[0-9]{9}$/;
+//str = "01521443805";
+
+//email address
+//re = /^([a-zA-Z0-9](\.|\-|\_)?)+[^\.^\_^\-^\@]@[a-z\.]+[^\.^\_^\-^\!^\@^\#^\$^\&^\*]$/;
+//str = "mmm1604116@askdlfhgaskdlf.com.bd.un";
+
+// html tag
+//re = /^<\/?[a-z]+>$/;
+//str = "</div>";
+
+//console.log(re.test(str));
+
+//alert(selectOption.options[selectOption.selectedIndex].text);
