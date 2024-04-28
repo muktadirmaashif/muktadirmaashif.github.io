@@ -15,7 +15,7 @@ timezone: Asia/Dhaka
 
 title: Muktadir M Aashif # the main title
 
-tagline: Showcasing myself # it will display as the sub-title
+tagline: Bookworm, coffee is <3 # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
   A minimal, responsive and feature-rich Jekyll theme for technical writing.
