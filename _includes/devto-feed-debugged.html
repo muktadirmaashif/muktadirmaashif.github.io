@@ -1,0 +1,124 @@
+<!-- Dev.to Blog Feed -->
+<!-- Light Theme -->
+<style>
+.devto-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+.article-preview {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.article-title {
+    color: #2d3748;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.read-more {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #3182ce;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}
+</style>
+
+<!-- Dark Theme -->
+<style>
+.dark .devto-container {
+    background: #1a1a1a;
+}
+
+.dark .article-preview {
+    background: #2d2d2d;
+    border: 1px solid #404040;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.dark .article-title {
+    color: #e2e8f0;
+}
+
+.dark p {
+    color: #cbd5e0;
+}
+
+.dark small {
+    color: #a0aec0;
+}
+
+.dark .read-more {
+    color: #63b3ed;
+}
+
+.dark .debug-panel {
+    background: #2d2d2d;
+    border-color: #404040;
+    color: #cbd5e0;
+}
+</style>
+
+<div class="devto-container">
+    <div id="debug-panel" class="debug-panel">Starting fetch...</div>
+    <div id="devto-articles"></div>
+</div>
+
+<script>
+async function fetchDevToPosts() {
+    const debugPanel = document.getElementById('debug-panel');
+    const articlesContainer = document.getElementById('devto-articles');
+    
+    try {
+        const response = await fetch('https://dev.to/feed/muktadirmaashif');
+        
+        const text = await response.text();
+        
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(text, "text/xml");
+        const items = xmlDoc.getElementsByTagName("item");
+        
+        if (items.length > 0) {
+            const html = Array.from(items).map(item => {
+                const title = item.getElementsByTagName("title")[0].textContent;
+                const link = item.getElementsByTagName("link")[0].textContent;
+                const description = item.getElementsByTagName("description")[0].textContent;
+                const pubDate = new Date(item.getElementsByTagName("pubDate")[0].textContent)
+                    .toLocaleDateString();
+                
+                return `
+                    <div class="article-preview">
+                        <h3><a href="${link}" class="article-title" target="_blank">${title}</a></h3>
+                        <p>${description}</p>
+                        <small>${pubDate}</small>
+                        <div>
+                            <a href="${link}" class="read-more" target="_blank">Read full article →</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            articlesContainer.innerHTML = html;
+        } else {
+            articlesContainer.innerHTML = '<p>No articles found</p>';
+        }
+        
+    } catch (error) {
+        articlesContainer.innerHTML = '<p>Error loading articles. Please check the console for details.</p>';
+        console.error('Error:', error);
+    }
+}
+
+window.addEventListener('load', fetchDevToPosts);
+</script>

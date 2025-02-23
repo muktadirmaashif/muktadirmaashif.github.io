@@ -16,7 +16,6 @@ timezone: Asia/Dhaka
 title: Muktadir M Aashif # the main title
 
 tagline: Bookworm, coffee is <3 # it will display as the sub-title
-
 description: >- # used by seo meta and the atom feed
   A minimal, responsive and feature-rich Jekyll theme for technical writing.
 
@@ -74,7 +73,7 @@ theme_mode: # [light | dark]
 img_cdn:
 
 # the avatar on sidebar, support local or CORS resources
-avatar: ./assets/image/me-rounded.png
+avatar: /assets/img/me-rounded.png
 
 # The URL of the site-wide social preview image used in SEO `og:image` meta tag.
 # It can be overridden by a customized `page.image` in front matter.
@@ -164,7 +163,7 @@ defaults:
       type: tabs # see `site.collections`
     values:
       layout: page
-      permalink: /:title/
+      #    permalink: /:title/
   - scope:
       path: assets/js/dist
     values:
@@ -172,6 +171,7 @@ defaults:
 
 sass:
   style: compressed
+  sass_dir: _sass
 
 compress_html:
   clippings: all
@@ -181,6 +181,10 @@ compress_html:
   blanklines: false
   ignore:
     envs: [development]
+
+
+include:
+  - "_includes"
 
 exclude:
   - "*.gem"
