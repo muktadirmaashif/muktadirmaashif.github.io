@@ -1,0 +1,77 @@
+/* Resume styles */
+.resume-header {
+  margin-bottom: 2rem;
+}
+
+.name {
+  font-size: 2rem !important;
+  margin-bottom: 0.5rem !important;
+  color: var(--heading-color);
+}
+
+.contact-info {
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.section-header {
+  color: var(--heading-color);
+  font-size: 1.2rem !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1rem !important;
+  font-weight: bold !important;
+  border-bottom: 1px solid var(--main-border-color);
+}
+
+.project-title, .achievement-title {
+  color: var(--heading-color);
+  font-size: 1.1rem !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: bold !important;
+}
+
+.personal-details-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.personal-details-table td {
+  padding: 0.3rem 1rem 0.3rem 0;
+  border: none;
+}
+
+.personal-details-table td:first-child {
+  font-weight: bold;
+  white-space: nowrap;
+  width: 200px;
+}
+
+/* Bullet point and list styling */
+ul {
+  list-style-type: none;
+  padding-left: 1.5rem;
+}
+
+ul li:before {
+  content: "•";
+  position: absolute;
+  margin-left: -1.5rem;
+}
+
+/* Link styling */
+a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.test-sass {
+  font-size: 5rem !important;
+  background-color: red;
+  border: 5px solid blue;
+  font-weight: bold;
+}

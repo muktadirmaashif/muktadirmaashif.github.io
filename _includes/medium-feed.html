@@ -1,0 +1,141 @@
+<!--light theme-->
+
+<style>
+.medium-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+.article-preview {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--main-border-color);
+    border-radius: 0.625rem;
+    background: var(--card-bg);
+    box-shadow: var(--card-shadow);
+}
+
+.article-title {
+    color: var(--heading-color);
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-family: Lato, "Microsoft Yahei", sans-serif;
+}
+
+.article-description {
+    color: var(--text-color);
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+.article-metadata {
+    color: var(--text-muted-color);
+    font-size: 0.85rem;
+}
+
+.read-more {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--link-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.read-more:hover {
+    color: #d2603a;
+    border-bottom: 1px solid #d2603a;
+    text-decoration: none;
+}
+</style>
+
+<div class="medium-container">
+    <div id="medium-articles"></div>
+</div>
+
+<script>
+async function fetchMediumPosts() {
+    const articlesContainer = document.getElementById('medium-articles');
+    const CACHE_KEY = 'medium_articles';
+    const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
+
+    try {
+        // Check cache first
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            const { data, timestamp } = JSON.parse(cached);
+            const isValid = Date.now() - timestamp < CACHE_DURATION;
+
+            if (isValid) {
+                articlesContainer.innerHTML = data;
+                return;
+            }
+        }
+
+        // Medium's RSS feed URL with a proxy to bypass CORS
+        const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@shuvra.dev9');
+        const data = await response.json();
+
+        if (data.items && data.items.length > 0) {
+            const html = data.items.map(item => {
+                const title = item.title;
+                const link = item.link;
+
+                // Clean description from HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = item.description;
+                const description = tempDiv.textContent.slice(0, 150) + '...';
+
+                const pubDate = new Date(item.pubDate)
+                    .toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+
+                const categories = item.categories.join(', ');
+
+                return `
+                    <div class="article-preview">
+                        <a href="${link}" class="article-title" target="_blank">${title}</a>
+                        <p class="article-description">${description}</p>
+                        <div class="article-metadata">
+                            <span>${pubDate}</span>
+                            ${categories ? ` • ${categories}` : ''}
+                        </div>
+                        <div>
+                            <a href="${link}" class="read-more" target="_blank">Read full article →</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Save to cache
+            const cacheData = {
+                data: html,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+
+            articlesContainer.innerHTML = html;
+        } else {
+            articlesContainer.innerHTML = '<p>No articles found</p>';
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        articlesContainer.innerHTML = '<p>Error loading articles. Please try again later.</p>';
+
+        // If error occurs, try to show cached content if available
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            const { data } = JSON.parse(cached);
+            articlesContainer.innerHTML = data;
+        }
+    }
+}
+
+window.addEventListener('load', fetchMediumPosts);
+</script>

@@ -1,0 +1,126 @@
+<!--light theme-->
+
+<style>
+.devto-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+.article-preview {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--main-border-color);
+    border-radius: 0.625rem;
+    background: var(--card-bg);
+    box-shadow: var(--card-shadow);
+}
+
+.article-title {
+    color: var(--heading-color);
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-family: Lato, "Microsoft Yahei", sans-serif;
+}
+
+.article-description {
+    color: var(--text-color);
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+.article-metadata {
+    color: var(--text-muted-color);
+    font-size: 0.85rem;
+}
+
+.read-more {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--link-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.read-more:hover {
+    color: #d2603a;
+    border-bottom: 1px solid #d2603a;
+    text-decoration: none;
+}
+</style>
+
+<div class="devto-container">
+    <div id="devto-articles"></div>
+</div>
+
+<script>
+async function fetchDevToPosts() {
+    const articlesContainer = document.getElementById('devto-articles');
+
+    try {
+        const response = await fetch('https://dev.to/feed/muktadirmaashif');
+        const text = await response.text();
+
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(text, "text/xml");
+        const items = xmlDoc.getElementsByTagName("item");
+
+        if (items.length > 0) {
+            const html = Array.from(items).map(item => {
+                // Basic info
+                const title = item.getElementsByTagName("title")[0].textContent;
+                const link = item.getElementsByTagName("link")[0].textContent;
+
+                // Parse description properly
+                const descElement = item.getElementsByTagName("description")[0];
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = descElement.textContent;
+                // Get first paragraph and truncate
+                const firstParagraph = tempDiv.innerText.split('\n')[0];
+                const description = firstParagraph.length > 150 ?
+                    firstParagraph.slice(0, 150) + '...' :
+                    firstParagraph;
+
+                // Date formatting
+                const pubDate = new Date(item.getElementsByTagName("pubDate")[0].textContent)
+                    .toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+
+                // Get categories/tags
+                const categories = Array.from(item.getElementsByTagName("category"))
+                    .map(cat => cat.textContent)
+                    .join(', ');
+
+                return `
+                    <div class="article-preview">
+                        <a href="${link}" class="article-title" target="_blank">${title}</a>
+                        <p class="article-description">${description}</p>
+                        <div class="article-metadata">
+                            <span>${pubDate}</span>
+                            ${categories ? ` • ${categories}` : ''}
+                        </div>
+                        <div>
+                            <a href="${link}" class="read-more" target="_blank">Read full article →</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            articlesContainer.innerHTML = html;
+        } else {
+            articlesContainer.innerHTML = '<p>No articles found</p>';
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        articlesContainer.innerHTML = '<p>Error loading articles. Please try again later.</p>';
+    }
+}
+
+window.addEventListener('load', fetchDevToPosts);
+</script>
