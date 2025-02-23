@@ -1,7 +1,7 @@
 ---
 # the default layout is 'page'
-icon: fas fa-info-circle
-order: 6 
+icon: fa-solid fa-trophy 
+order: 4 
 ---
 <h2 align="center">Hi 👋, It's Muktadir</h2>
 <h3 align="center">A reader who loves his coffee black, loves to ride on single speed. Becoming DevOps Engineer</h3>

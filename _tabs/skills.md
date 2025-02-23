@@ -1,9 +1,8 @@
 ---
 icon: fas fa-hammer
-order: 1 
+order: 2 
+parmalink: /skills/
 ---
-
-#### MY AREA OF EXPERTISE / INTERESTS
 
 <div align="left">
   <img alt="Github" src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=yellow" />
@@ -18,4 +17,3 @@ order: 1
   <img alt="Github" src="https://img.shields.io/badge/weblogic-white?style=for-the-badge&logo=oracle&logoColor=red" />
 </div>
 
----
