@@ -1,12 +1,14 @@
 ---
-layout: default 
-title: Blogs
+layout: page
 # Index page
 ---
+
+<h1 align="center">Hi! It's Muktadir!</h1>
+
 ## Blogs from <img alt="Github" src="https://img.shields.io/badge/dev-black?style=for-the-badge&logo=DEV&logoColor=white" />
 
 <div>
-    {% include devto-feed.html %}
+    {% include devto-feed-api.html %}
 </div>
 
 
