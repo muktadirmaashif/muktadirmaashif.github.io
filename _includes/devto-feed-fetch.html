@@ -1,0 +1,107 @@
+<!--light theme-->
+
+<style>
+.devto-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+.article-preview {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--main-border-color);
+    border-radius: 0.625rem;
+    background: var(--card-bg);
+    box-shadow: var(--card-shadow);
+}
+
+.article-title {
+    color: var(--heading-color);
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-family: Lato, "Microsoft Yahei", sans-serif;
+}
+
+.article-description {
+    color: var(--text-color);
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+.article-metadata {
+    color: var(--text-muted-color);
+    font-size: 0.85rem;
+}
+
+.read-more {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--link-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.read-more:hover {
+    color: #d2603a;
+    border-bottom: 1px solid #d2603a;
+    text-decoration: none;
+}
+</style>
+
+<div class="devto-container">
+    <div id="devto-articles"></div>
+</div>
+
+<script>
+async function fetchDevToPosts() {
+    const articlesContainer = document.getElementById('devto-articles');
+    try {
+        // Use local JSON file instead of direct API call
+        const response = await fetch('/assets/data/devto-articles.json');
+        const articles = await response.json();
+
+        if (articles.length > 0) {
+            const html = articles.map(article => {
+                // Extract data from API response
+                const title = article.title;
+                const link = article.url;
+
+                // Format the date
+                const pubDate = new Date(article.published_at)
+                    .toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+
+                // Get tags
+                const tags = article.tag_list.join(', ');
+
+                return `
+                    <div class="article-preview">
+                        <a href="${link}" class="article-title" target="_blank">${title}</a>
+                        <div class="article-metadata">
+                            <span>${pubDate}</span>
+                            ${tags ? ` • ${tags}` : ''}
+                        </div>
+                        <div>
+                            <a href="${link}" class="read-more" target="_blank">Read full article →</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            articlesContainer.innerHTML = html;
+        } else {
+            articlesContainer.innerHTML = '<p>No articles found</p>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        articlesContainer.innerHTML = '<p>Error loading articles. Please try again later.</p>';
+    }
+}
+
+window.addEventListener('load', fetchDevToPosts);
+</script>
