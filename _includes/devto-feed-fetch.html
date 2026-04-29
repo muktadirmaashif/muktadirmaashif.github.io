@@ -49,6 +49,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
     .tag-list {
@@ -77,44 +78,60 @@
     .read-more:hover {
         text-decoration: underline;
     }
+    
+    /* Added specific style for error/loading states */
+    .status-message {
+        color: var(--text-muted-color, #888);
+        font-style: italic;
+    }
+    .error-message {
+        color: #d2603a;
+        font-weight: bold;
+    }
 </style>
 
 <div class="devto-container">
     <h2 style="margin-bottom: 1.5rem; color: var(--heading-color, #333);">Latest from Dev.to</h2>
     <div id="devto-articles">
-        <!-- Loading State -->
-        <p style="color: var(--text-muted-color, #888);">Loading articles...</p>
+        <p class="status-message">Loading articles...</p>
     </div>
 </div>
 
 <script>
-    // CONFIGURATION: Replace with your Dev.to username
+    // ⚠️ CRITICAL: REPLACE THIS WITH YOUR ACTUAL DEV.TO USERNAME
     const DEV_TO_USERNAME = 'muktadirmaashif'; 
-    const ARTICLES_COUNT = 5; // Limit to keep page light
+    const ARTICLES_COUNT = 5;
 
     async function fetchDevToPosts() {
         const articlesContainer = document.getElementById('devto-articles');
         
+        // 1. Check if username is still default
+        if (DEV_TO_USERNAME === 'YOUR_DEVTO_USERNAME') {
+            articlesContainer.innerHTML = '<p class="error-message">⚠️ Configuration Error: Please set your Dev.to username in the script.</p>';
+            return;
+        }
+
         try {
-            // Direct API call to Dev.to
+            console.log(`Fetching articles for: ${DEV_TO_USERNAME}`);
+            
+            // Fetch from Dev.to API
             const response = await fetch(`https://dev.to/api/articles?username=${DEV_TO_USERNAME}&per_page=${ARTICLES_COUNT}`);
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`API returned ${response.status}: ${response.statusText}`);
             }
             
             const articles = await response.json();
+            console.log(`Found ${articles.length} articles.`);
 
             if (articles.length > 0) {
                 const html = articles.map(article => {
-                    // Format the date
                     const pubDate = new Date(article.published_at).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric'
                     });
 
-                    // Create tags HTML
                     const tagsHtml = article.tag_list.slice(0, 3).map(tag => 
                         `<span class="tag">${tag}</span>`
                     ).join('');
@@ -134,14 +151,21 @@
                 
                 articlesContainer.innerHTML = html;
             } else {
-                articlesContainer.innerHTML = '<p>No articles found.</p>';
+                articlesContainer.innerHTML = '<p class="status-message">No articles found for this user.</p>';
             }
         } catch (error) {
-            console.error('Error fetching Dev.to posts:', error);
-            articlesContainer.innerHTML = '<p style="color: red;">Unable to load articles at this time.</p>';
+            console.error('Dev.to Fetch Error:', error);
+            articlesContainer.innerHTML = `
+                <p class="error-message">Failed to load articles.</p>
+                <p style="font-size: 0.8rem; color: #666;">Check console for details (F12).</p>
+            `;
         }
     }
 
-    // Use DOMContentLoaded for faster execution than 'load'
-    document.addEventListener('DOMContentLoaded', fetchDevToPosts);
+    // Execute when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', fetchDevToPosts);
+    } else {
+        fetchDevToPosts();
+    }
 </script>
