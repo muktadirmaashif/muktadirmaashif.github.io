@@ -1,107 +1,147 @@
 <!--light theme-->
-
 <style>
-.devto-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1rem;
-}
+    .devto-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 1rem;
+        font-family: Lato, "Microsoft Yahei", sans-serif;
+    }
 
-.article-preview {
-    margin-bottom: 1.5rem;
-    padding: 1.5rem;
-    border: 1px solid var(--main-border-color);
-    border-radius: 0.625rem;
-    background: var(--card-bg);
-    box-shadow: var(--card-shadow);
-}
+    .article-preview {
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        border: 1px solid var(--main-border-color, #e0e0e0);
+        border-radius: 0.625rem;
+        background: var(--card-bg, #ffffff);
+        box-shadow: var(--card-shadow, 0 2px 4px rgba(0,0,0,0.05));
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-.article-title {
-    color: var(--heading-color);
-    font-weight: 600;
-    text-decoration: none;
-    margin-bottom: 0.5rem;
-    display: block;
-    font-family: Lato, "Microsoft Yahei", sans-serif;
-}
+    .article-preview:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
 
-.article-description {
-    color: var(--text-color);
-    margin: 0.5rem 0;
-    line-height: 1.5;
-}
+    .article-title {
+        color: var(--heading-color, #333);
+        font-weight: 700;
+        text-decoration: none;
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 1.25rem;
+    }
 
-.article-metadata {
-    color: var(--text-muted-color);
-    font-size: 0.85rem;
-}
+    .article-title:hover {
+        color: var(--link-color, #d2603a);
+    }
 
-.read-more {
-    display: inline-block;
-    margin-top: 1rem;
-    color: var(--link-color);
-    text-decoration: none;
-    font-size: 0.9rem;
-}
+    .article-description {
+        color: var(--text-color, #555);
+        margin: 0.5rem 0;
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
 
-.read-more:hover {
-    color: #d2603a;
-    border-bottom: 1px solid #d2603a;
-    text-decoration: none;
-}
+    .article-metadata {
+        color: var(--text-muted-color, #888);
+        font-size: 0.85rem;
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .tag-list {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .tag {
+        background: #f0f0f0;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        color: #555;
+    }
+
+    .read-more {
+        display: inline-block;
+        margin-top: 1rem;
+        color: var(--link-color, #d2603a);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .read-more:hover {
+        text-decoration: underline;
+    }
 </style>
 
 <div class="devto-container">
-    <div id="devto-articles"></div>
+    <h2 style="margin-bottom: 1.5rem; color: var(--heading-color, #333);">Latest from Dev.to</h2>
+    <div id="devto-articles">
+        <!-- Loading State -->
+        <p style="color: var(--text-muted-color, #888);">Loading articles...</p>
+    </div>
 </div>
 
 <script>
-async function fetchDevToPosts() {
-    const articlesContainer = document.getElementById('devto-articles');
-    try {
-        // Use local JSON file instead of direct API call
-        const response = await fetch('/assets/data/devto-articles.json');
-        const articles = await response.json();
+    // CONFIGURATION: Replace with your Dev.to username
+    const DEV_TO_USERNAME = 'your_username_here'; 
+    const ARTICLES_COUNT = 5; // Limit to keep page light
 
-        if (articles.length > 0) {
-            const html = articles.map(article => {
-                // Extract data from API response
-                const title = article.title;
-                const link = article.url;
+    async function fetchDevToPosts() {
+        const articlesContainer = document.getElementById('devto-articles');
+        
+        try {
+            // Direct API call to Dev.to
+            const response = await fetch(`https://dev.to/api/articles?username=${DEV_TO_USERNAME}&per_page=${ARTICLES_COUNT}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const articles = await response.json();
 
-                // Format the date
-                const pubDate = new Date(article.published_at)
-                    .toLocaleDateString('en-US', {
+            if (articles.length > 0) {
+                const html = articles.map(article => {
+                    // Format the date
+                    const pubDate = new Date(article.published_at).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric'
                     });
 
-                // Get tags
-                const tags = article.tag_list.join(', ');
+                    // Create tags HTML
+                    const tagsHtml = article.tag_list.slice(0, 3).map(tag => 
+                        `<span class="tag">${tag}</span>`
+                    ).join('');
 
-                return `
-                    <div class="article-preview">
-                        <a href="${link}" class="article-title" target="_blank">${title}</a>
-                        <div class="article-metadata">
-                            <span>${pubDate}</span>
-                            ${tags ? ` • ${tags}` : ''}
+                    return `
+                        <div class="article-preview">
+                            <a href="${article.url}" class="article-title" target="_blank" rel="noopener noreferrer">${article.title}</a>
+                            <div class="article-description">${article.description || 'No description available.'}</div>
+                            <div class="article-metadata">
+                                <span>${pubDate}</span>
+                                <div class="tag-list">${tagsHtml}</div>
+                            </div>
+                            <a href="${article.url}" class="read-more" target="_blank" rel="noopener noreferrer">Read full article →</a>
                         </div>
-                        <div>
-                            <a href="${link}" class="read-more" target="_blank">Read full article →</a>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            articlesContainer.innerHTML = html;
-        } else {
-            articlesContainer.innerHTML = '<p>No articles found</p>';
+                    `;
+                }).join('');
+                
+                articlesContainer.innerHTML = html;
+            } else {
+                articlesContainer.innerHTML = '<p>No articles found.</p>';
+            }
+        } catch (error) {
+            console.error('Error fetching Dev.to posts:', error);
+            articlesContainer.innerHTML = '<p style="color: red;">Unable to load articles at this time.</p>';
         }
-    } catch (error) {
-        console.error('Error:', error);
-        articlesContainer.innerHTML = '<p>Error loading articles. Please try again later.</p>';
     }
-}
 
-window.addEventListener('load', fetchDevToPosts);
+    // Use DOMContentLoaded for faster execution than 'load'
+    document.addEventListener('DOMContentLoaded', fetchDevToPosts);
 </script>
